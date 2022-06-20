@@ -16,10 +16,16 @@ data Expression = Constant Double
                 | Division Expression Expression
                 | Modulus Expression Expression
                 | Negation Expression
+                | FunctionInvocation String Expression
                 deriving (Show)
 
+data FunctionBody = FunctionBody String Expression
+                  deriving (Show)
+
 data Statement = PrintStatement Expression
-              deriving (Show)
+               | AssignmentStatement String Expression
+               | FunctionDefinition String FunctionBody
+               deriving (Show)
 
 lexer :: TokenParser ()
 lexer = makeTokenParser (javaStyle {opStart = oneOf "+-*/%", opLetter = oneOf "+-*/%"})
@@ -31,8 +37,14 @@ parseNumber = do
     Left i -> return $ Constant $ fromIntegral i
     Right n -> return $ Constant n
 
+parseFunctionInvocation :: Parser Expression
+parseFunctionInvocation = do
+  ident <- identifier lexer
+  expr <- parens lexer parseExpression
+  return $ FunctionInvocation ident expr
+
 parseTerm :: Parser Expression
-parseTerm = parens lexer parseExpression <|> parseNumber <|> (identifier lexer >>= return .Identifier)
+parseTerm = parens lexer parseExpression <|> parseNumber <|> try parseFunctionInvocation <|> (identifier lexer >>= return .Identifier)
 
 parsePrint :: Parser Statement
 parsePrint = do
@@ -40,10 +52,27 @@ parsePrint = do
   expr <- parseExpression
   return $ PrintStatement expr
 
+parseAssignment :: Parser Statement
+parseAssignment = do
+  reserved lexer "let"
+  ident <- identifier lexer
+  reservedOp lexer "="
+  expr <- parseExpression
+  return $ AssignmentStatement ident expr
+
+parseFunctionDefinition :: Parser Statement
+parseFunctionDefinition = do
+  reserved lexer "def"
+  ident <- identifier lexer
+  argname <- parens lexer $ identifier lexer
+  reservedOp lexer "="
+  expr <- parseExpression
+  return $ FunctionDefinition ident (FunctionBody argname expr)
+
 parseInput :: Parser Statement
 parseInput = do
   whiteSpace lexer
-  s <- parsePrint
+  s <- (parsePrint <|> parseAssignment <|> parseFunctionDefinition)
   eof
   return s
 
@@ -62,7 +91,9 @@ parseExpression = (flip buildExpressionParser) parseTerm $
     ]
 
 -- Interpreter
-type Calculator a = StateT (M.Map String Expression) IO a
+type StoredVal = Either Double FunctionBody
+
+type Calculator a = StateT (M.Map String StoredVal) IO a
 
 interpretExpression :: Expression -> Calculator Double
 interpretExpression (Constant n) = return n
@@ -70,7 +101,8 @@ interpretExpression (Identifier i) = do
   varmap <- get
   case M.lookup i varmap of
     Nothing -> fail ("Unknown identifier: " ++ i)
-    Just e -> interpretExpression e
+    Just (Left n) -> return n
+    Just (Right _) -> fail ("you must call function: " ++ i)
 interpretExpression (Addition e1 e2) = do
   v1 <- interpretExpression e1
   v2 <- interpretExpression e2
@@ -97,24 +129,44 @@ interpretExpression (Modulus e1 e2) = do
 interpretExpression (Negation e1) = do
   v1 <- interpretExpression e1
   return $ negate v1
+interpretExpression (FunctionInvocation fn e) = do
+  ctx <- get
+  case M.lookup fn ctx of
+    Nothing -> fail ("Unknown Function: " ++ fn)
+    Just (Left _) -> fail ("cannot call constant: " ++ fn)
+    Just (Right (FunctionBody argname expr)) -> do
+      n <- interpretExpression e
+      modify (M.insert argname (Left n))
+      r <- interpretExpression expr
+      modify (M.delete argname)
+      return r
   
 interpretStatement :: Statement -> Calculator ()
 interpretStatement (PrintStatement expr) = do
   n <- interpretExpression expr
   liftIO $ print n
+interpretStatement (AssignmentStatement ident expr) = do
+  n <- interpretExpression expr
+  modify (M.insert ident (Left n))
+interpretStatement (FunctionDefinition fn body) = do
+  modify (M.insert fn (Right body))
 
-defaultVars :: M.Map String Expression
+defaultVars :: M.Map String StoredVal
 defaultVars = M.fromList [
-  ("pi", Constant 3.141)
+  ("pi", Left 3.14)
   ]
 
-calculate :: String -> IO ()
-calculate s =
+calculate :: String -> Calculator ()
+calculate s = do
   case ret of
-    Left e -> putStrLn $ "error: " ++ show e
-    Right n -> evalStateT (interpretStatement n) defaultVars
+    Left e -> liftIO $ putStrLn $ "error: " ++ show e
+    Right n -> interpretStatement n
   where
     ret = parse parseInput "" s
 
+calculator :: Calculator ()
+calculator = 
+  liftIO getContents >>= (mapM_ calculate) . lines
+
 main :: IO ()
-main = getContents >>= (mapM_ calculate) . lines
+main = evalStateT calculator defaultVars

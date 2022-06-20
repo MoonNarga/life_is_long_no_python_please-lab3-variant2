@@ -2,6 +2,10 @@
 
 ## 0.1.2.0 -- 2022-06-20
 
+* Support user-defined functions.
+
+## 0.1.2.0 -- 2022-06-20
+
 * Successfully try to use varmap.
 
 ## 0.1.1.0 -- 2022-06-17
