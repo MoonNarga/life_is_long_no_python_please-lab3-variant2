@@ -19,29 +19,29 @@ for the specific model of computation. For that, you need:
 
 - Design an input language. Depends on your variant, it should be:
 
-   - an embedded domain-specific (eDSL) language
+  - an embedded domain-specific (eDSL) language
 
-   - a string with specific syntax and semantic.
+  - a string with specific syntax and semantic.
 
 - Design types for MoC object representation and interpreter
 
 - Implement an interpreter for computational process models (descriptions)
 
-   - define different computational process models
+  - define different computational process models
 
-   - execute them separately with computational process trace
+  - execute them separately with computational process trace
 
-   - execute them with different input data
+  - execute them with different input data
 
-   - visualize computational process models.
+  - visualize computational process models.
 
 - Testing. Should include:
 
-   - several simple examples of interpreter usages
+  - several simple examples of interpreter usages
 
-   - at least one complex example
+  - at least one complex example
 
-   - cornet cases.
+  - cornet cases.
 
 - Input data validation in aspect-oriented style.
 
