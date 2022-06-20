@@ -4,28 +4,57 @@
 
 ### Objectives
 
-Use development tools: Haskell, IDE/source code editor, git
-, Github Actions, and laboratory work process.
+- Design an embedded domain-specific language or a simple text parser.
 
-Design algorithms and data structures in mutable styles.
+- Design architecture of a simple interpreter.
 
-Develop unit and property-based tests Students should meet with tools and
-typical development workflow on the classical development task in the first
-laboratory work: developing a library for a specific data structure.
+- Develop a simple interpreter for a specific model of computation.
 
-Students should implement the selected by the variants data structure as a
-mutable object (interaction with an object should modify it if applicable). All
- changes should be performed in place, by changing the initial structure.
+- Develop unit tests.
+
+- Develop input data control in the aspect-oriented style.
+  
+In the second laboratory work, students should develop a simple interpreter
+for the specific model of computation. For that, you need:
+
+1. Design an input language. Depends on your variant, it should be:
+
+   - an embedded domain-specific (eDSL) language for building computational
+process description
+
+   - a string with specific syntax and semantic.
+
+2. Design types for MoC object representation and interpreter, which allows
+your library user to execute a computational process description.
+
+3. Implement an interpreter for computational process models (descriptions)
+. User should be possible to:
+
+   - define different computational process models
+
+   - execute them separately with computational process trace
+
+   - execute them with different input data
+
+   - visualize computational process models.
+
+4. Testing. Should include:
+
+   - several simple examples of interpreter usages
+
+   - at least one complex example
+
+   - cornet cases.
+
+5. Input data validation in aspect-oriented style.
 
 ## Variant
 
-- No.3 Set based on binary-tree
+- No.2 Mathematical expression by string substitution
 
 ## Struct of project
 
-- The main.hs in app/ is just a file init by cabal. It doesn't matter.
-
-- The implementation of Binary Search Tree is in src/BST.hs.
+- The calculator.hs in app/ is the implementation.
 
 - The test runs by the cabal, and the test cases are in test/*.hs.
 
@@ -33,41 +62,15 @@ mutable object (interaction with an object should modify it if applicable). All
 
 - The use of Haskell.
 
-- Achieve a generator of random tree struct.
+- Achieve a calculator works like `REPL`
 
 ## Design note
 
-Fix the function `fromList`, now it will build the tree as a normal order.
-~~The function ``fromList`` generate a BST by the reverse order by the argus.
-(It really confuse me at first because I build the test cases as normal)~~
+In the begining, I tried to load the expression byte by byte
+and eval it by stack, but it's really inefficient.
 
-Build complete pattern matching for every functions.
-
-It's really hard to understand that ``BST Int``,
-maybe like the templete in C++?
-Like ``BST<int>``.
-
-## Answer for questions
-
-- What should happen, if a user puts `None` value to the data structure?
-
-    Actually there is no `None` in haskell, so that is not a problem.
-    But it's funny when it comes to `Nothing`, it's possible and legal
-    to insert `Nothing` into an `Empty` tree. Because `Nothing` is an instance
-    of `Ord`. And that would lead to error when insert another normal
-    data into the tree.
-
-    ![avatar](./pictures/test_of_insert_Nothing.png)
-
-- About Test
-
-    We can build the unit test for our code, but when build the cases,
-    we are still following the logic we wrote the code. So it is normal that
-    we miss some situations.
-
-    PBT test may overcome this problem, it would make test more comprehensive.
-    Now, we have used the ``quickcheck`` to generate data and make some tests.
-    But there is still a problem that I don't konw how to use ``Arbitrary``.
+Finally I imitate others to implement it with Parsec, it's
+so convient to convert every part of the string into Expressions.
 
 ## Contribution
 
