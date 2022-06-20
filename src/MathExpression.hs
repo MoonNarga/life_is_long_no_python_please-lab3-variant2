@@ -37,16 +37,16 @@ _tokenizer (ch : expr) buf previous
   | Data.Char.isDigit ch = _tokenizer expr (ch : buf) previous -- 把数字放入缓冲区
   | otherwise -- 当前字符不是数字
     =
-    case buf of -- 检查缓冲区是否为空
-      [] ->
-        -- 缓冲区为空
-        case ch of -- 解析当前字符
-          '+' -> _tokenizer expr [] (TPlus : previous)
-          '-' -> _tokenizer expr [] (TSub : previous)
-          '*' -> _tokenizer expr [] (TMul : previous)
-          '/' -> _tokenizer expr [] (TDiv : previous)
-          _ -> error "illegal operational char"
-      _ -> _tokenizer (ch : expr) [] (Num (read $ reverse buf) : previous) -- 缓冲区不为空，读取缓冲区字符
+      case buf of -- 检查缓冲区是否为空
+        [] ->
+          -- 缓冲区为空
+          case ch of -- 解析当前字符
+            '+' -> _tokenizer expr [] (TPlus : previous)
+            '-' -> _tokenizer expr [] (TSub : previous)
+            '*' -> _tokenizer expr [] (TMul : previous)
+            '/' -> _tokenizer expr [] (TDiv : previous)
+            _ -> error "illegal operational char"
+        _ -> _tokenizer (ch : expr) [] (Num (read $ reverse buf) : previous) -- 缓冲区不为空，读取缓冲区字符
 
 tokenizer :: String -> [Token]
 tokenizer expr = _tokenizer (fixString expr) [] []

@@ -13,22 +13,19 @@
 - Develop unit tests.
 
 - Develop input data control in the aspect-oriented style.
-  
+
 In the second laboratory work, students should develop a simple interpreter
 for the specific model of computation. For that, you need:
 
-1. Design an input language. Depends on your variant, it should be:
+- Design an input language. Depends on your variant, it should be:
 
-   - an embedded domain-specific (eDSL) language for building computational
-process description
+   - an embedded domain-specific (eDSL) language
 
    - a string with specific syntax and semantic.
 
-2. Design types for MoC object representation and interpreter, which allows
-your library user to execute a computational process description.
+- Design types for MoC object representation and interpreter
 
-3. Implement an interpreter for computational process models (descriptions)
-. User should be possible to:
+- Implement an interpreter for computational process models (descriptions)
 
    - define different computational process models
 
@@ -38,7 +35,7 @@ your library user to execute a computational process description.
 
    - visualize computational process models.
 
-4. Testing. Should include:
+- Testing. Should include:
 
    - several simple examples of interpreter usages
 
@@ -46,7 +43,7 @@ your library user to execute a computational process description.
 
    - cornet cases.
 
-5. Input data validation in aspect-oriented style.
+- Input data validation in aspect-oriented style.
 
 ## Variant
 
