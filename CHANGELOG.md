@@ -1,6 +1,10 @@
 # Revision history for life-is-long-no-python-please-lab3-variant2
 
-## 0.1.2.0 -- 2022-06-20
+## 0.2.0.0 -- 2022-06-20
+
+* Fix the document and the format.
+
+## 0.1.3.0 -- 2022-06-20
 
 * Support user-defined functions.
 

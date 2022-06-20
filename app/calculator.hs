@@ -1,31 +1,39 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use <&>" #-}
+{-# HLINT ignore "Use <$>" #-}
+{-# HLINT ignore "Redundant bracket" #-}
+{-# HLINT ignore "Redundant flip" #-}
 module Main where
 
+import Control.Monad.State
+import qualified Data.Map as M
 import Text.Parsec
 import Text.Parsec.Expr
 import Text.Parsec.Language
 import Text.Parsec.String
 import Text.Parsec.Token
-import Control.Monad.State
-import qualified Data.Map as M
 
-data Expression = Constant Double
-                | Identifier String
-                | Addition Expression Expression
-                | Subtraction Expression Expression
-                | Multiplication Expression Expression
-                | Division Expression Expression
-                | Modulus Expression Expression
-                | Negation Expression
-                | FunctionInvocation String Expression
-                deriving (Show)
+data Expression
+  = Constant Double
+  | Identifier String
+  | Addition Expression Expression
+  | Subtraction Expression Expression
+  | Multiplication Expression Expression
+  | Division Expression Expression
+  | Modulus Expression Expression
+  | Negation Expression
+  | FunctionInvocation String Expression
+  deriving (Show)
 
 data FunctionBody = FunctionBody String Expression
-                  deriving (Show)
+  deriving (Show)
 
-data Statement = PrintStatement Expression
-               | AssignmentStatement String Expression
-               | FunctionDefinition String FunctionBody
-               deriving (Show)
+data Statement
+  = PrintStatement Expression
+  | AssignmentStatement String Expression
+  | FunctionDefinition String FunctionBody
+  deriving (Show)
 
 lexer :: TokenParser ()
 lexer = makeTokenParser (javaStyle {opStart = oneOf "+-*/%", opLetter = oneOf "+-*/%"})
@@ -44,7 +52,7 @@ parseFunctionInvocation = do
   return $ FunctionInvocation ident expr
 
 parseTerm :: Parser Expression
-parseTerm = parens lexer parseExpression <|> parseNumber <|> try parseFunctionInvocation <|> (identifier lexer >>= return .Identifier)
+parseTerm = parens lexer parseExpression <|> parseNumber <|> try parseFunctionInvocation <|> (identifier lexer >>= return . Identifier)
 
 parsePrint :: Parser Statement
 parsePrint = do
@@ -77,7 +85,9 @@ parseInput = do
   return s
 
 parseExpression :: Parser Expression
-parseExpression = (flip buildExpressionParser) parseTerm $
+parseExpression =
+  (flip buildExpressionParser)
+    parseTerm
     [ [ Prefix (reservedOp lexer "-" >> return Negation),
         Prefix (reservedOp lexer "+" >> return id)
       ],
@@ -140,7 +150,7 @@ interpretExpression (FunctionInvocation fn e) = do
       r <- interpretExpression expr
       modify (M.delete argname)
       return r
-  
+
 interpretStatement :: Statement -> Calculator ()
 interpretStatement (PrintStatement expr) = do
   n <- interpretExpression expr
@@ -152,9 +162,10 @@ interpretStatement (FunctionDefinition fn body) = do
   modify (M.insert fn (Right body))
 
 defaultVars :: M.Map String StoredVal
-defaultVars = M.fromList [
-  ("pi", Left 3.14)
-  ]
+defaultVars =
+  M.fromList
+    [ ("pi", Left 3.14)
+    ]
 
 calculate :: String -> Calculator ()
 calculate s = do
@@ -165,7 +176,7 @@ calculate s = do
     ret = parse parseInput "" s
 
 calculator :: Calculator ()
-calculator = 
+calculator =
   liftIO getContents >>= (mapM_ calculate) . lines
 
 main :: IO ()

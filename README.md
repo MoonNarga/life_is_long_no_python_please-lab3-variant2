@@ -64,13 +64,62 @@ your library user to execute a computational process description.
 
 - Achieve a calculator works like `REPL`
 
+- Support default variable like `pi`.
+
+- Support declaration of variable.
+
+- Support user-define function with one parameter.
+
+## Usage
+
+```
+runghc app/calculator.hs
+```
+
+or execute
+
+```
+build --enable-tests --enable-benchmarks all
+```
+
+And then you will get an executable program.
+
+To declare a var:
+
+```
+let a = 1
+```
+
+To define a function:
+
+```
+def f(a) = a * 2
+```
+
+Only one parameter is support in function definition.
+
+To evaluate a expression:
+
+```
+print <Expression>
+```
+
+## Test
+
+I didn't find a way to test it in the Unit test, sorry for that.
+I just build unit test for the old version, and the following is for new one
+
+![avatar](./pictures/test.png)
+
 ## Design note
 
 In the begining, I tried to load the expression byte by byte
 and eval it by stack, but it's really inefficient.
+Previous version is `src/MathExpression.hs`
 
 Finally I imitate others to implement it with Parsec, it's
 so convient to convert every part of the string into Expressions.
+New version is `app/calculator.hs`
 
 ## Contribution
 
