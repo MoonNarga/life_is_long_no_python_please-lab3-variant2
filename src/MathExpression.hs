@@ -47,14 +47,14 @@ _tokenizer (ch : expr) buf previous
       _ -> _tokenizer (ch : expr) [] (Num (read $ reverse buf) : previous) -- 缓冲区不为空，读取缓冲区字符
 
 tokenizer :: String -> [Token]
-tokenizer expr = reverse (_tokenizer (fixString expr) [] [])
+tokenizer expr = _tokenizer (fixString expr) [] []
 
 -- 定义操作符运算
 evalOp :: Token -> Int -> Int -> Int
-evalOp TPlus a b = b + a
-evalOp TSub a b = b - a
-evalOp TMul a b = b * a
-evalOp TDiv a b = b `div` a
+evalOp TPlus a b = a + b
+evalOp TSub a b = a - b
+evalOp TMul a b = a * b
+evalOp TDiv a b = a `div` b
 
 -- 搞一个好看点的包装函数
 eval :: [Token] -> Int
